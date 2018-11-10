@@ -1,55 +1,44 @@
 from ChessBoardProcessor import ChessBoardProcessor
 from CNNModel import CNNModel
+from ChessBoardGenerator import GameBoardGenerator
 import cv2
 import os
 
+
 def main():
 
-	chess_model = CNNModel(model_version=0)
+	"""
+	Flow for creating a game_board object with the baseline board in the test set
+	"""
+	test_dir = 'data/board_photos/test/'
+	baseline_board_path = test_dir + 'baseline_board.jpg'
+	game_board = ChessBoardProcessor(blank_board=baseline_board_path)
+
+	"""
+	Flow for creating a CNN object
+	Training and tested are commented out but this is how it would be called
+	Even after training the weights must be loaded into the model to get the best weights
+	"""
+
+	chess_model = CNNModel(model_version=1)
 	chess_model.compile_model()
-	chess_model.train_model(augment=0)
+	#chess_model.train_model(augment=0)
 	chess_model.load_model_best_weights()
-	chess_model.test_models()
+	#chess_model.test_models()
 
+	"""
+	Two examples of loading a test image that has the same baseline, predicting the pieces
+	and outputting to screen a board example
+	"""
+	test_board_path = 'data/board_photos/test/IMG_20181005_162420.jpg'
+	test_board = GameBoardGenerator(game_board.board_split(test_board_path,1),chess_model)
+	test_board.predict_pieces()
+	test_board.display_board()
 
-
-    # set2_dir = 'data/board_photos/set2/'
-    # set2_array = os.listdir(set2_dir)
-
-    # baseline_board_path = set2_dir + 'baseline_board.jpg'
-    # game_board = ChessBoardProcessor(blank_board=baseline_board_path)
-
-    # # for file in set2_array:
-    # # 	if file == 'baseline_board.jpg':
-    # # 		continue
-    # # 	else:
-    # # 		board_img_path = set2_dir + file
-    # # 		game_board.board_split(board_img_path, state=0)
-
-    # unsorted_dir = 'data/training_photos/unsorted/'
-    # unsorted_array = os.listdir(unsorted_dir)
-    # num_pics = len(unsorted_array)
-    # value = 1
-
-    # for file_path in unsorted_array:
-    # 	full_file_path = unsorted_dir + file_path
-    # 	piece_pic = cv2.imread(full_file_path,0)
-    # 	game_board.label_image(piece_pic)
-    # 	print('Image {} of {}'.format(value,num_pics))
-    # 	value += 1
-
-    # test_board_path = 'IMG_20181007_134352.jpg'
-    # test_board_dict = game_board.board_split(test_board_path,1)
-
-    # #check a few pieces
-    # game_board.piece_display(test_board_dict['e4'])
-    # game_board.piece_display(test_board_dict['e5'])
-    # game_board.piece_display(test_board_dict['d4'])
-    # game_board.piece_display(test_board_dict['d5'])
-    # game_board.piece_display(test_board_dict['a1'])
-    # game_board.piece_display(test_board_dict['a8'])
-    # game_board.piece_display(test_board_dict['h1'])
-    # game_board.piece_display(test_board_dict['h8'])
+	test_board_path_2 = 'data/board_photos/test/IMG_20181005_162943.jpg'
+	test_board2 = GameBoardGenerator(game_board.board_split(test_board_path_2,1),chess_model)
+	test_board2.predict_pieces()
+	test_board2.display_board()
 
 if __name__ == "__main__":
-    main()
+	main()
